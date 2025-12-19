@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>MemoryOS Pro v4.5 - Neuro-Research Edition</title>
+<title>Alizhat</title>
 
 <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
@@ -280,7 +280,7 @@
 
 // --- [EXTENSION START] COGNITIVE SCIENCE & RESEARCH MODULE V1.0 ---
 // Department of Neuro-Analytics
-// Author: MemoryOS Research Team
+// Author: Alizhat Research Team
 // Description: This module provides high-precision statistical analysis, reaction time tracking,
 // and the proprietary Cognitive Stability Index (CSI) without altering the core App state logic.
 
@@ -720,7 +720,7 @@ const ResearchDashboard = ({ dailyScores, logs, tasks }) => {
         // Core Tasks
         const [tasks, setTasks] = useState(() => {
             try {
-                const saved = localStorage.getItem('memoryOs_tasks');
+                const saved = localStorage.getItem('Alizhat_tasks');
                 return saved ? JSON.parse(saved) : [];
             } catch (e) { return []; }
         });
@@ -728,7 +728,7 @@ const ResearchDashboard = ({ dailyScores, logs, tasks }) => {
         // --- AYARLAR STATE (BUG FIX) ---
         const [settings, setSettings] = useState(() => {
             try {
-                const saved = localStorage.getItem('memoryOs_settings');
+                const saved = localStorage.getItem('Alizhat_settings');
                 // Varsayılan değerler
                 const defaults = { 
                     threshold: 40, 
@@ -758,7 +758,7 @@ const ResearchDashboard = ({ dailyScores, logs, tasks }) => {
 
         // Profile
         const [userProfile, setUserProfile] = useState(() => {
-            const saved = localStorage.getItem('memoryOs_profile');
+            const saved = localStorage.getItem('Alizhat_profile');
             // Varsayılan yaşı '65-75' yaptık
             return saved ? JSON.parse(saved) : { age: '65-75', condition: 'Normal', allowDelete: true, tc: '11111111111', name: 'Ahmet Yılmaz' };
         });
@@ -769,12 +769,12 @@ const ResearchDashboard = ({ dailyScores, logs, tasks }) => {
         const [authError, setAuthError] = useState('');
 
         // Feature States
-        const [calendarEvents, setCalendarEvents] = useState(() => JSON.parse(localStorage.getItem('memoryOs_calendar') || '[]'));
-        const [actionLogs, setActionLogs] = useState(() => JSON.parse(localStorage.getItem('memoryOs_logs') || '[]'));
+        const [calendarEvents, setCalendarEvents] = useState(() => JSON.parse(localStorage.getItem('Alizhat_calendar') || '[]'));
+        const [actionLogs, setActionLogs] = useState(() => JSON.parse(localStorage.getItem('Alizhat_logs') || '[]'));
         
         // NEW: Cognitive & Behavior Engines
-        const [dailyScores, setDailyScores] = useState(() => JSON.parse(localStorage.getItem('memoryOs_dailyScores') || '[]'));
-        const [behaviorProfile, setBehaviorProfile] = useState(() => JSON.parse(localStorage.getItem('memoryOs_behavior') || '{"hourlyStats": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}'));
+        const [dailyScores, setDailyScores] = useState(() => JSON.parse(localStorage.getItem('Alizhat_dailyScores') || '[]'));
+        const [behaviorProfile, setBehaviorProfile] = useState(() => JSON.parse(localStorage.getItem('Alizhat_behavior') || '{"hourlyStats": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}'));
         const [riskFlags, setRiskFlags] = useState([]);
         
         // UI States
@@ -824,13 +824,13 @@ const ResearchDashboard = ({ dailyScores, logs, tasks }) => {
         };
 
         // --- PERSISTENCE EFFECTS ---
-        useEffect(() => { localStorage.setItem('memoryOs_tasks', JSON.stringify(tasks)); }, [tasks]);
-        useEffect(() => { localStorage.setItem('memoryOs_settings', JSON.stringify(settings)); }, [settings]);
-        useEffect(() => { localStorage.setItem('memoryOs_profile', JSON.stringify(userProfile)); }, [userProfile]);
-        useEffect(() => { localStorage.setItem('memoryOs_calendar', JSON.stringify(calendarEvents)); }, [calendarEvents]);
-        useEffect(() => { localStorage.setItem('memoryOs_logs', JSON.stringify(actionLogs)); }, [actionLogs]);
-        useEffect(() => { localStorage.setItem('memoryOs_dailyScores', JSON.stringify(dailyScores)); }, [dailyScores]);
-        useEffect(() => { localStorage.setItem('memoryOs_behavior', JSON.stringify(behaviorProfile)); }, [behaviorProfile]);
+        useEffect(() => { localStorage.setItem('Alizhat_tasks', JSON.stringify(tasks)); }, [tasks]);
+        useEffect(() => { localStorage.setItem('Alizhat_settings', JSON.stringify(settings)); }, [settings]);
+        useEffect(() => { localStorage.setItem('Alizhat_profile', JSON.stringify(userProfile)); }, [userProfile]);
+        useEffect(() => { localStorage.setItem('Alizhat_calendar', JSON.stringify(calendarEvents)); }, [calendarEvents]);
+        useEffect(() => { localStorage.setItem('Alizhat_logs', JSON.stringify(actionLogs)); }, [actionLogs]);
+        useEffect(() => { localStorage.setItem('Alizhat_dailyScores', JSON.stringify(dailyScores)); }, [dailyScores]);
+        useEffect(() => { localStorage.setItem('Alizhat_behavior', JSON.stringify(behaviorProfile)); }, [behaviorProfile]);
         // --- SİSTEM EFEKTİ: SADECE DURUM DEĞİŞİNCE GÜNCELLE ---
         useEffect(() => {
             if (userProfile.condition) {
@@ -1121,13 +1121,13 @@ const ResearchDashboard = ({ dailyScores, logs, tasks }) => {
         // --- REPORTING ENGINE ---
         const exportWordReport = () => {
             // DÜZELTME 3: Rapor fonksiyonundaki link hataları giderildi
-            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>MemoryOS Rapor</title></head><body>";
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Alizhat Rapor</title></head><body>";
             const footer = "</body></html>";
             
             const score = calculateDailyCognitiveScore(tasks);
             
             let content = `
-                <h1 style="color:#333; font-Veli:Arial">MemoryOS v4.0 - Kapsamlı Bilişsel Rapor</h1>
+                <h1 style="color:#333; font-Veli:Arial">Alizhat v4.0 - Kapsamlı Bilişsel Rapor</h1>
                 <p><strong>Hasta:</strong> ${userProfile.name} (${userProfile.tc})</p>
                 <p><strong>Tarih:</strong> ${new Date().toLocaleString('tr-TR')}</p>
                 <p><strong>Günlük Skor:</strong> ${score.score}/100 (${score.status})</p>
@@ -1159,7 +1159,7 @@ const ResearchDashboard = ({ dailyScores, logs, tasks }) => {
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `MemoryOS_Rapor_${userProfile.name}_${new Date().toISOString().slice(0,10)}.doc`;
+            link.download = `Alizhat_Rapor_${userProfile.name}_${new Date().toISOString().slice(0,10)}.doc`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -1865,5 +1865,4 @@ const ResearchDashboard = ({ dailyScores, logs, tasks }) => {
     root.render(<App />);
 </script>
 </body>
-
 </html>
