@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MemoryOS Pro v4.5 - Neuro-Research Edition</title>
+
+<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?Veli=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&Veli=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    dark: {
+                        950: '#050510',
+                        900: '#0f0c29',
+                        800: '#1a1b3c',
+                        700: '#302b63',
+                    },
+                    neon: {
+                        purple: '#b000ff',
+                        blue: '#00d4ff',
+                        pink: '#ff0080',
+                        green: '#00ff9d',
+                        red: '#ff2a2a',
+                        amber: '#FFBF00'
+                    },
+                    Hasta: {
+                        bg: '#000000',
+                        card: '#1a1a1a',
+                        text: '#ffffff',
+                        accent: '#FFD700',
+                        danger: '#FF4444',
+                        success: '#44FF44'
+                    },
+                    // Research Mode Colors
+                    research: {
+                        base: '#0B1026',
+                        panel: '#151B3B',
+                        grid: '#232D5B',
+                        chart: '#4B5EFF'
+                    }
+                },
+                fontVeli: {
+                    sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    mono: ['JetBrains Mono', 'monospace'],
+                },
+                animation: {
+                    'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    'float': 'float 6s ease-in-out infinite',
+                    'flash-red': 'flashRed 1s infinite',
+                    'slide-up': 'slideUp 0.3s ease-out forwards',
+                    'scan': 'scan 2s linear infinite',
+                },
+                keyframes: {
+                    float: {
+                        '0%, 100%': { transform: 'translateY(0)' },
+                        '50%': { transform: 'translateY(-10px)' },
+                    },
+                    flashRed: {
+                        '0%, 100%': { backgroundColor: 'rgba(255, 0, 0, 0.1)' },
+                        '50%': { backgroundColor: 'rgba(255, 0, 0, 0.5)' },
+                    },
+                    slideUp: {
+                        '0%': { transform: 'translateY(20px)', opacity: '0' },
+                        '100%': { transform: 'translateY(0)', opacity: '1' },
+                    },
+                    scan: {
+                        '0%': { backgroundPosition: '0% 0%' },
+                        '100%': { backgroundPosition: '0% 100%' },
+                    }
+                }
+            }
+        }
+    }
+</script>
+
+<style>
+    body { 
+        font-Veli: 'Plus Jakarta Sans', sans-serif; 
+        background: radial-gradient(circle at top right, #302b63, #0f0c29);
+        color: #e2e8f0;
+        min-height: 100vh;
+        transition: background 0.5s ease;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    body.Hasta-mode {
+        background: #000000 !important;
+        color: #ffffff !important;
+    }
+    
+    body.emergency-active {
+        background: #2a0000 !important;
+    }
+
+    .glass-panel { 
+        background: rgba(255, 255, 255, 0.03); 
+        backdrop-filter: blur(16px); 
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .Hasta-panel {
+        background: #1a1a1a;
+        border: 3px solid #333;
+        box-shadow: none;
+        backdrop-filter: none;
+    }
+
+    .glass-input {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+    .glass-input:focus {
+        border-color: #b000ff;
+        background: rgba(0, 0, 0, 0.5);
+        outline: none;
+    }
+
+    .Hasta-input {
+        background: #000;
+        border: 3px solid #FFD700;
+        color: white;
+        font-size: 1.5rem;
+        padding: 1rem;
+    }
+
+    .slide-in { animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #0f0c29; }
+    ::-webkit-scrollbar-thumb { background: #302b63; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #b000ff; }
+    
+    .gradient-text {
+        background: linear-gradient(135deg, #00d4ff 0%, #b000ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .neon-shadow {
+        box-shadow: 0 0 15px rgba(176, 0, 255, 0.3);
+    }
+    
+    .Hasta-mode *:focus {
+        outline: 4px solid #FFD700;
+        outline-offset: 2px;
+    }
+
+    /* Research Mode Specific Styles */
+    .research-grid {
+        background-image: linear-gradient(rgba(75, 94, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(75, 94, 255, 0.05) 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+</style>
+</head>
+<body>
+
+<div id="ambient-bg" class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none transition-opacity duration-500">
+    <div class="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[120px] animate-pulse-slow"></div>
+    <div class="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px]"></div>
+</div>
+
+<div id="root"></div>
+
+<script type="text/babel">
+    const { useState, useEffect, useMemo, useRef, useCallback } = React;
+
+    const Icons = {
+        Brain: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>,
+        Chart: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>,
+        Plus: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+        Settings: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>,
+        Download: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>,
+        Clock: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+        Trash: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>,
+        Fire: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>,
+        Lock: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>,
+        Stethoscope: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4.8 2.3A.3.3 0 0 1 5 2h14a.3.3 0 0 1 .2.3v3.3a.3.3 0 0 1-.3.3H5a.3.3 0 0 1-.3-.3V2.3zM6 8v3a6 6 0 0 0 12 0V8"/><path d="M12 17v4"/><path d="M8 21h8"/></svg>,
+        Word: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>,
+        Calendar: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+        User: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+        Shield: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+        Eye: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>,
+        Alert: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>,
+        Keypad: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>,
+        // EXTENSION ICON
+        Microscope: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 18h8"/><path d="M3 22h18"/><path d="M14 22a7 7 0 1 0 0-14h-1"/><path d="M9 14h2"/><path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z"/><path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"/></svg>
+    };
+
+    // --- ALGORİTMA MOTORU ---
+    // --- ALGORİTMA MOTORU (SADECE DURUM BAZLI) ---
+    const calculateSmartLambda = (condition) => {
+        // Sadece tıbbi duruma göre net katsayılar
+        switch(condition) {
+            case 'Normal': return 0.00005; // Standart (Yavaş Unutma)
+            case 'Hafif':  return 0.00020; // Normalden 4 kat hızlı
+            case 'Orta':   return 0.00050; // Normalden 10 kat hızlı
+            case 'İleri':  return 0.00100; // Normalden 20 kat hızlı (Kritik)
+            default: return 0.00005;
+        }
+    };
+
+    const calculateRetention = (elapsedSeconds, lambda) => {
+        const val = 100 * Math.exp(-lambda * elapsedSeconds);
+        return Math.max(0, val);
+    };
+
+    const getRetentionText = (percentage) => {
+        if (percentage >= 70) return "Güçlü Bellek İzlenimi";
+        if (percentage >= 40) return "Destek Gerekebilir";
+        return "Kritik Unutma Riski";
+    };
+
+    const detectCategory = (name) => {
+        const lower = name.toLowerCase();
+        if (lower.includes('ilaç') || lower.includes('hap') || lower.includes('doktor') || lower.includes('tansiyon') || lower.includes('şeker')) return 'Health';
+        if (lower.includes('anne') || lower.includes('baba') || lower.includes('torun') || lower.includes('kahve') || lower.includes('ziyaret')) return 'Social';
+        return 'Daily';
+    };
+
+    const simulateProjection = (currentLambda, days) => {
+        const timeUnit = days * 1800;
+        const current = 100 * Math.exp(-currentLambda * timeUnit);
+        const improved = 100 * Math.exp(-(currentLambda * 0.85) * timeUnit);
+        const worse = 100 * Math.exp(-(currentLambda * 1.25) * timeUnit);
+        return { current, improved, worse };
+    };
+
+    const calculateDailyCognitiveScore = (tasks) => {
+        const today = new Date().toDateString();
+        const todaysTasks = tasks.filter(t => t.history.some(h => new Date(h.date).toDateString() === today));
+        
+        if (todaysTasks.length === 0) return { score: 0, status: 'No Data' };
+
+        let totalPoints = 0;
+        let totalWeight = 0;
+
+        todaysTasks.forEach(t => {
+            const todayHistory = t.history.filter(h => new Date(h.date).toDateString() === today);
+            todayHistory.forEach(h => {
+                const weight = t.isCritical ? 2.0 : 1.0; 
+                const lambdaDifficulty = Math.max(1, t.lambda * 10000); 
+                
+                if (h.result === 'remembered') {
+                    totalPoints += (100 * weight * lambdaDifficulty);
+                } else {
+                    totalPoints -= (50 * weight);
+                }
+                totalWeight += (weight * lambdaDifficulty);
+            });
+        });
+
+        const normalizedScore = totalWeight > 0 ? Math.max(0, Math.min(100, (totalPoints / totalWeight) * 1.5)) : 0;
+        
+        return { 
+            score: Math.round(normalizedScore), 
+            count: todaysTasks.length,
+            status: normalizedScore > 80 ? 'Excellent' : normalizedScore > 50 ? 'Stable' : 'Decline'
+        };
+    };
+
+    const USER_DB = {
+        '11111111111': { role: 'Hasta', name: 'Ahmet Yılmaz', pin: null, linkedDoktor: '33333333333' },
+        '22222222222': { role: 'Veli', name: 'Ayşe (Kızınız)', pin: '1234', patientTC: '11111111111' },
+        '33333333333': { role: 'Doktor', name: 'Dr. Mehmet Öz', pin: '9999', patientTC: '11111111111' }
+    };
+
+// --- [EXTENSION START] COGNITIVE SCIENCE & RESEARCH MODULE V1.0 ---
+// Department of Neuro-Analytics
+// Author: MemoryOS Research Team
+// Description: This module provides high-precision statistical analysis, reaction time tracking,
+// and the proprietary Cognitive Stability Index (CSI) without altering the core App state logic.
+
+/**
+ * @module NeuroMath
+ * @description Static class providing advanced statistical operations for cognitive datasets.
+ * Includes methods for Linear Regression, Variance Analysis, and Z-Score normalization.
+ */
+class NeuroMath {
+    static calculateMean(numbers) {
+        if (!numbers || numbers.length === 0) return 0;
+        return numbers.reduce((a, b) => a + b, 0) / numbers.length;
+    }
+
+    static calculateVariance(numbers) {
+        if (!numbers || numbers.length === 0) return 0;
+        const mean = this.calculateMean(numbers);
+        const squareDiffs = numbers.map(n => Math.pow(n - mean, 2));
+        return this.calculateMean(squareDiffs);
+    }
+
+    static calculateStandardDeviation(numbers) {
+        return Math.sqrt(this.calculateVariance(numbers));
+    }
+
+    static calculateLinearRegression(yValues) {
+        // Assume x is index [0, 1, 2...]
+        const n = yValues.length;
+        if (n < 2) return { slope: 0, intercept: 0, r2: 0, trend: 'insufficient_data' };
+
+        const xValues = Array.from({ length: n }, (_, i) => i);
+        const sumX = this.calculateMean(xValues) * n;
+        const sumY = this.calculateMean(yValues) * n;
+        const sumXY = xValues.reduce((sum, x, i) => sum + x * yValues[i], 0);
+        const sumXX = xValues.reduce((sum, x) => sum + x * x, 0);
+
+        const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+        const intercept = (sumY - slope * sumX) / n;
+
+        // Calculate R-Squared
+        const yMean = sumY / n;
+        const totalSS = yValues.reduce((sum, y) => sum + Math.pow(y - yMean, 2), 0);
+        const residualSS = yValues.reduce((sum, y, i) => {
+            const yPred = slope * xValues[i] + intercept;
+            return sum + Math.pow(y - yPred, 2);
+        }, 0);
+        const r2 = 1 - (residualSS / totalSS);
+
+        return {
+            slope,
+            intercept,
+            r2,
+            trend: slope > 0.5 ? 'improving' : slope < -0.5 ? 'declining' : 'stable'
+        };
+    }
+}
+
+/**
+ * @module LogParser
+ * @description Parses the existing 'actionLogs' (localStorage) to infer reaction times.
+ * It calculates the delta between 'ADD_TASK'/'FEEDBACK' (Stimulus) and the next 'FEEDBACK' (Response).
+ * This creates a parallel data layer for Reaction Time without modifying the core data model.
+ */
+class LogParser {
+    static extractReactionTimes(logs) {
+        // Logs are typically in reverse chronological order (newest first). 
+        // We need chronological for analysis.
+        const sortedLogs = [...logs].reverse();
+        const reactionTimes = [];
+        
+        let lastStimulusTime = null;
+
+        sortedLogs.forEach(log => {
+            const ts = new Date(log.timestamp).getTime();
+
+            // What constitutes a stimulus?
+            // 1. Adding a task (User sees it) - weak stimulus
+            // 2. An Alarm Trigger (User hears it) - strong stimulus (not logged explicitly as trigger in core, assuming feedback implies interaction)
+            // 3. Completing a previous task (sets focus for next)
+            
+            // Heuristic: Time between any user action and the NEXT feedback action is "Task Processing Time"
+            if (log.action === 'FEEDBACK') {
+                if (lastStimulusTime) {
+                    const delta = ts - lastStimulusTime;
+                    // Filter unrealistic times: < 1 sec (accidental), > 5 mins (distracted)
+                    if (delta > 1000 && delta < 300000) { 
+                         // Extract Task ID if possible to link category
+                         const taskIdMatch = log.details.match(/Task (\d+)/);
+                         const taskId = taskIdMatch ? taskIdMatch[1] : 'unknown';
+                         const status = log.details.includes('remembered') ? 'success' : 'fail';
+                         
+                         reactionTimes.push({
+                             timestamp: ts,
+                             duration: delta,
+                             taskId,
+                             status
+                         });
+                    }
+                }
+                lastStimulusTime = ts; // Feedback itself is a stimulus for the next flow
+            } else if (log.action === 'ADD_TASK' || log.action === 'APP_OPEN') {
+                lastStimulusTime = ts;
+            }
+        });
+
+        return reactionTimes;
+    }
+}
+
+/**
+ * @module CSICalculator
+ * @description Implements the Cognitive Stability Index (CSI).
+ * CSI is a composite score (0-100) derived from:
+ * 1. Consistency (Low Variance in daily scores) - 40%
+ * 2. Accuracy (Ratio of remembered/forgotten) - 40%
+ * 3. Latency Stability (Reaction time consistency) - 20%
+ */
+class CSICalculator {
+    static compute(dailyScores, reactionTimes) {
+        if (dailyScores.length < 3) return { index: 0, label: "Veri Yetersiz", components: {} };
+
+        // 1. Accuracy Component (based on Daily Scores)
+        // We take the last 7 entries
+        const recentScores = dailyScores.slice(-7).map(s => s.score);
+        const avgScore = NeuroMath.calculateMean(recentScores);
+        const scoreWeighted = (avgScore / 100) * 100; // Normalize 0-100
+
+        // 2. Consistency Component (Inverse of Coefficient of Variation)
+        const stdDev = NeuroMath.calculateStandardDeviation(recentScores);
+        // CV = (StdDev / Mean). Lower is better.
+        // If Mean is 0, CV is undefined, handle gracefully.
+        const cv = avgScore > 0 ? stdDev / avgScore : 1;
+        // Transform CV to Stability Score: 0 CV -> 100 Stability. 0.5 CV -> 0 Stability.
+        const consistencyRaw = Math.max(0, 100 - (cv * 200)); 
+
+        // 3. Latency Component
+        const recentLatencies = reactionTimes.slice(-20).map(r => r.duration);
+        const avgLat = NeuroMath.calculateMean(recentLatencies);
+        const latStd = NeuroMath.calculateStandardDeviation(recentLatencies);
+        // Z-score stability: How consistent is the speed?
+        const latCV = avgLat > 0 ? latStd / avgLat : 1;
+        const latencyStability = Math.max(0, 100 - (latCV * 200));
+
+        // Composite Weighting
+        const csi = (scoreWeighted * 0.4) + (consistencyRaw * 0.4) + (latencyStability * 0.2);
+
+        let label = "Bilinmiyor";
+        if (csi > 80) label = "Yüksek Kararlılık";
+        else if (csi > 60) label = "Normal Dalgalanma";
+        else if (csi > 40) label = "Hafif İstikrarsızlık";
+        else label = "Kritik Kararsızlık";
+
+        return {
+            index: Math.round(csi),
+            label,
+            components: {
+                accuracy: Math.round(scoreWeighted),
+                consistency: Math.round(consistencyRaw),
+                latency: Math.round(latencyStability)
+            }
+        };
+    }
+}
+
+/**
+ * @component NeuroGraph
+ * @description A lightweight, dependency-free SVG charting component for scientific data visualization.
+ * Supports: Line Charts (Trend), Bar Charts (Distribution), and Regression Lines.
+ */
+const NeuroGraph = ({ data, width = 500, height = 200, color = "#4B5EFF", type = "line", showRegression = false }) => {
+    if (!data || data.length === 0) return <div className="flex items-center justify-center h-full text-slate-500 text-xs">NO SIGNAL DATA</div>;
+
+    const values = data.map(d => d.value);
+    const max = Math.max(...values, 100);
+    const min = Math.min(...values, 0);
+    const range = max - min || 1;
+
+    // Normalization helper
+    const getX = (i) => (i / (data.length - 1)) * width;
+    const getY = (v) => height - ((v - min) / range) * height;
+
+    // Generate Path
+    let pathD = "";
+    if (type === "line") {
+        pathD = `M ${getX(0)} ${getY(values[0])} `;
+        for (let i = 1; i < values.length; i++) {
+            // Simple Bezier smoothing
+            const x = getX(i);
+            const y = getY(values[i]);
+            const prevX = getX(i-1);
+            const prevY = getY(values[i-1]);
+            const cX1 = prevX + (x - prevX) / 2;
+            const cY1 = prevY;
+            const cX2 = prevX + (x - prevX) / 2;
+            const cY2 = y;
+            pathD += `C ${cX1} ${cY1}, ${cX2} ${cY2}, ${x} ${y} `;
+        }
+        // Fill Area
+        const fillD = pathD + `L ${width} ${height} L 0 ${height} Z`;
+        
+        // Regression Line
+        let regLine = null;
+        if (showRegression) {
+            const reg = NeuroMath.calculateLinearRegression(values);
+            const yStart = reg.slope * 0 + reg.intercept;
+            const yEnd = reg.slope * (values.length - 1) + reg.intercept;
+            regLine = <line x1="0" y1={getY(yStart)} x2={width} y2={getY(yEnd)} stroke="#FF4444" strokeWidth="2" strokeDasharray="5,5" opacity="0.7" />;
+        }
+
+        return (
+            <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} overflow="visible">
+                <defs>
+                    <linearGradient id={`grad-${color}`} x1="0" x2="0" y1="0" y2="1">
+                        <stop offset="0%" stopColor={color} stopOpacity="0.5"/>
+                        <stop offset="100%" stopColor={color} stopOpacity="0"/>
+                    </linearGradient>
+                </defs>
+                <path d={fillD} fill={`url(#grad-${color})`} />
+                <path d={pathD} fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" />
+                {regLine}
+                {data.map((d, i) => (
+                    <circle key={i} cx={getX(i)} cy={getY(d.value)} r="3" fill="#fff" stroke={color} className="opacity-0 hover:opacity-100 transition-opacity">
+                        <title>{d.label}: {d.value}</title>
+                    </circle>
+                ))}
+            </svg>
+        );
+    }
+    return null;
+};
+
+/**
+ * @component ResearchDashboard
+ * @description The main interface for the Neuro-Research Module.
+ * Aggregates all data sources and presents them in a clinically oriented dashboard.
+ */
+const ResearchDashboard = ({ dailyScores, logs, tasks }) => {
+    const [activeTab, setActiveTab] = useState('overview'); // overview, csi, latency
+    
+    // Process Data on Mount / Update
+    const analyticsData = useMemo(() => {
+        // 1. Reaction Times
+        const rTimes = LogParser.extractReactionTimes(logs);
+        
+        // 2. CSI
+        const csiData = CSICalculator.compute(dailyScores, rTimes);
+        
+        // 3. Score Trends (Last 30 Days)
+        const trendData = dailyScores.slice(-30).map(s => ({
+            value: s.score,
+            label: new Date(s.date).toLocaleDateString()
+        }));
+
+        // 4. Latency Trend
+        const latencyTrend = rTimes.slice(-20).map(r => ({
+            value: Math.min(r.duration / 1000, 60), // Cap at 60s for visual
+            label: new Date(r.timestamp).toLocaleTimeString()
+        }));
+
+        return { rTimes, csiData, trendData, latencyTrend };
+    }, [dailyScores, logs]);
+
+    return (
+        <div className="slide-in w-full h-full text-slate-200">
+            {/* Research Header */}
+            <div className="flex items-center justify-between mb-8 border-b border-indigo-500/30 pb-4">
+                <div>
+                    <h2 className="text-3xl font-black text-white flex items-center gap-3">
+                        <span className="bg-indigo-600 p-2 rounded-lg"><Icons.Microscope /></span>
+                        NÖRO-ANALİTİK MERKEZİ
+                    </h2>
+                    <p className="text-indigo-300 font-mono text-xs mt-1 tracking-widest">CLINICAL RESEARCH DASHBOARD v1.0</p>
+                </div>
+                <div className="flex gap-2">
+                    {['overview', 'csi', 'latency'].map(tab => (
+                        <button 
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            className={`px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition-all border ${activeTab === tab ? 'bg-indigo-600 border-indigo-400 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)]' : 'bg-slate-900/50 border-slate-700 text-slate-500 hover:text-white'}`}
+                        >
+                            {tab === 'csi' ? 'CSI INDEX' : tab === 'latency' ? 'TEPKİ SÜRESİ' : 'GENEL BAKIŞ'}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* CONTENT AREA */}
+            <div className="research-grid p-6 rounded-3xl border border-indigo-900/50 bg-dark-900/80 backdrop-blur-xl min-h-[600px]">
+                
+                {/* 1. OVERVIEW TAB */}
+                {activeTab === 'overview' && (
+                    <div className="space-y-6 animate-[fadeIn_0.5s]">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {/* Key Metric 1: Mean Score */}
+                            <div className="bg-research-panel p-6 rounded-2xl border-l-4 border-indigo-500 relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><Icons.Brain/></div>
+                                <h3 className="text-indigo-400 text-xs font-bold uppercase mb-2">Ortalama Bilişsel Skor</h3>
+                                <div className="text-4xl font-mono font-bold text-white">
+                                    {NeuroMath.calculateMean(analyticsData.trendData.map(d=>d.value)).toFixed(1)}
+                                </div>
+                                <div className="text-xs text-slate-400 mt-2">Son 30 gün ortalaması</div>
+                            </div>
+
+                            {/* Key Metric 2: Progress Direction */}
+                            <div className="bg-research-panel p-6 rounded-2xl border-l-4 border-emerald-500 relative overflow-hidden">
+                                <h3 className="text-emerald-400 text-xs font-bold uppercase mb-2">İlerleme Eğilimi</h3>
+                                {(() => {
+                                    const reg = NeuroMath.calculateLinearRegression(analyticsData.trendData.map(d=>d.value));
+                                    return (
+                                        <>
+                                            <div className={`text-2xl font-bold ${reg.slope > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                                                {reg.slope > 0 ? '↗ POZİTİF GELİŞİM' : '↘ GERİLEME SİNYALİ'}
+                                            </div>
+                                            <div className="text-xs text-slate-400 mt-2 font-mono">Eğim (Slope): {reg.slope.toFixed(4)} | R²: {reg.r2.toFixed(2)}</div>
+                                        </>
+                                    );
+                                })()}
+                            </div>
+
+                            {/* Key Metric 3: Total Interaction */}
+                            <div className="bg-research-panel p-6 rounded-2xl border-l-4 border-neon-purple">
+                                <h3 className="text-neon-purple text-xs font-bold uppercase mb-2">Veri Seti Boyutu</h3>
+                                <div className="text-4xl font-mono font-bold text-white">{logs.length}</div>
+                                <div className="text-xs text-slate-400 mt-2">İşlenen toplam olay kaydı</div>
+                            </div>
+                        </div>
+
+                        {/* Main Trend Graph */}
+                        <div className="bg-slate-900/50 p-6 rounded-2xl border border-indigo-500/20">
+                            <h3 className="text-white font-bold mb-6 flex justify-between">
+                                <span>Uzun Dönem Bilişsel Performans Analizi</span>
+                                <span className="text-xs font-normal text-indigo-400 border border-indigo-400/30 px-2 py-1 rounded">Regresyon Analizi Aktif</span>
+                            </h3>
+                            <div className="h-64 w-full">
+                                <NeuroGraph data={analyticsData.trendData} color="#00d4ff" showRegression={true} />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* 2. CSI TAB */}
+                {activeTab === 'csi' && (
+                    <div className="animate-[fadeIn_0.5s] flex flex-col items-center justify-center h-full py-10">
+                        <div className="relative w-64 h-64 mb-10">
+                            <svg className="w-full h-full transform -rotate-90">
+                                <circle cx="128" cy="128" r="120" stroke="#1e1b4b" strokeWidth="20" fill="none" />
+                                <circle 
+                                    cx="128" cy="128" r="120" 
+                                    stroke={analyticsData.csiData.index > 70 ? '#10b981' : analyticsData.csiData.index > 40 ? '#f59e0b' : '#ef4444'} 
+                                    strokeWidth="20" 
+                                    fill="none" 
+                                    strokeDasharray={2 * Math.PI * 120} 
+                                    strokeDashoffset={2 * Math.PI * 120 * (1 - analyticsData.csiData.index / 100)}
+                                    className="transition-all duration-1000 ease-out"
+                                />
+                            </svg>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                                <div className="text-6xl font-black text-white">{analyticsData.csiData.index}</div>
+                                <div className="text-xs tracking-[0.2em] text-slate-400 uppercase mt-2">CSI SKORU</div>
+                            </div>
+                        </div>
+
+                        <div className="text-center mb-12">
+                            <h2 className={`text-3xl font-bold ${analyticsData.csiData.index > 70 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                {analyticsData.csiData.label}
+                            </h2>
+                            <p className="text-slate-400 max-w-lg mx-auto mt-2">
+                                Bilişsel Kararlılık İndeksi (CSI), varyans analizi, doğruluk oranı ve tepki süresi tutarlılığının ağırlıklı bir türevidir.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-8 w-full max-w-4xl">
+                            {Object.entries(analyticsData.csiData.components).map(([key, val]) => (
+                                <div key={key} className="bg-research-panel p-4 rounded-xl border border-white/5 text-center">
+                                    <div className="text-xs uppercase text-slate-500 mb-2">{key === 'accuracy' ? 'Doğruluk' : key === 'consistency' ? 'Tutarlılık' : 'Gecikme Stab.'}</div>
+                                    <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                        <div className="h-full bg-indigo-500" style={{width: `${val}%`}}></div>
+                                    </div>
+                                    <div className="text-right text-xs font-mono mt-1 text-indigo-300">%{val}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* 3. LATENCY TAB */}
+                {activeTab === 'latency' && (
+                    <div className="animate-[fadeIn_0.5s] space-y-6">
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="bg-research-panel p-6 rounded-2xl border-l-4 border-neon-amber">
+                                <h3 className="text-neon-amber text-xs font-bold uppercase mb-2">Ortalama Reaksiyon (ms)</h3>
+                                <div className="text-4xl font-mono font-bold text-white">
+                                    {NeuroMath.calculateMean(analyticsData.rTimes.map(r => r.duration)).toFixed(0)} <span className="text-lg text-slate-500">ms</span>
+                                </div>
+                            </div>
+                            <div className="bg-research-panel p-6 rounded-2xl border-l-4 border-neon-pink">
+                                <h3 className="text-neon-pink text-xs font-bold uppercase mb-2">Spike (Gecikme) Sayısı</h3>
+                                <div className="text-4xl font-mono font-bold text-white">
+                                    {analyticsData.rTimes.filter(r => r.duration > 10000).length}
+                                </div>
+                                <div className="text-xs text-slate-400 mt-2">10 saniye üzeri tepkiler</div>
+                            </div>
+                        </div>
+
+                        <div className="bg-slate-900/50 p-6 rounded-2xl border border-indigo-500/20">
+                            <h3 className="text-white font-bold mb-6">Reaksiyon Süresi Zaman Çizelgesi (Saniye)</h3>
+                            <div className="h-64 w-full">
+                                <NeuroGraph data={analyticsData.latencyTrend} color="#FFBF00" type="line" />
+                            </div>
+                        </div>
+
+                        <div className="bg-research-panel p-6 rounded-2xl">
+                            <h3 className="text-white font-bold mb-4">Ham Veri Akışı (Son 5 İşlem)</h3>
+                            <div className="font-mono text-xs text-slate-300 space-y-2">
+                                {analyticsData.rTimes.slice(0, 5).map((log, i) => (
+                                    <div key={i} className="flex justify-between border-b border-white/5 pb-2">
+                                        <span>{new Date(log.timestamp).toLocaleString()}</span>
+                                        <span className={log.duration < 3000 ? 'text-emerald-400' : 'text-red-400'}>
+                                            {(log.duration / 1000).toFixed(2)} sn
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+            </div>
+        </div>
+    );
+};
+// --- [EXTENSION END] ---
+
+    function App() {
+        // --- STATE MANAGEMENT ---
+        
+        // Core Tasks
+        const [tasks, setTasks] = useState(() => {
+            try {
+                const saved = localStorage.getItem('memoryOs_tasks');
+                return saved ? JSON.parse(saved) : [];
+            } catch (e) { return []; }
+        });
+
+        // --- AYARLAR STATE (BUG FIX) ---
+        const [settings, setSettings] = useState(() => {
+            try {
+                const saved = localStorage.getItem('memoryOs_settings');
+                // Varsayılan değerler
+                const defaults = { 
+                    threshold: 40, 
+                    baseLambda: 0.0005, 
+                    soundEnabled: true, 
+                    HastaMode: false, 
+                    viewerMode: 'user', 
+                    locked: false, 
+                    allowHastaAdd: false // <-- Bu anahtarın kesinlikle olduğundan emin oluyoruz
+                };
+                
+                // Eğer kayıtlı veri varsa, varsayılanlarla birleştir (Kayıtlı veri baskın gelir)
+                // Bu sayede yeni eklenen 'allowHastaAdd' özelliği eski kullanıcılarda 'undefined' kalmaz.
+                return saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
+            } catch (e) { 
+                return { 
+                    threshold: 40, 
+                    baseLambda: 0.0005, 
+                    soundEnabled: true, 
+                    HastaMode: false, 
+                    viewerMode: 'user', 
+                    locked: false, 
+                    allowHastaAdd: false 
+                }; 
+            }
+        });
+
+        // Profile
+        const [userProfile, setUserProfile] = useState(() => {
+            const saved = localStorage.getItem('memoryOs_profile');
+            // Varsayılan yaşı '65-75' yaptık
+            return saved ? JSON.parse(saved) : { age: '65-75', condition: 'Normal', allowDelete: true, tc: '11111111111', name: 'Ahmet Yılmaz' };
+        });
+
+        // Authentication & Identity
+        const [currentUser, setCurrentUser] = useState(null); // { role, name, tc, patientId }
+        const [authInput, setAuthInput] = useState({ tc: '', pin: '' });
+        const [authError, setAuthError] = useState('');
+
+        // Feature States
+        const [calendarEvents, setCalendarEvents] = useState(() => JSON.parse(localStorage.getItem('memoryOs_calendar') || '[]'));
+        const [actionLogs, setActionLogs] = useState(() => JSON.parse(localStorage.getItem('memoryOs_logs') || '[]'));
+        
+        // NEW: Cognitive & Behavior Engines
+        const [dailyScores, setDailyScores] = useState(() => JSON.parse(localStorage.getItem('memoryOs_dailyScores') || '[]'));
+        const [behaviorProfile, setBehaviorProfile] = useState(() => JSON.parse(localStorage.getItem('memoryOs_behavior') || '{"hourlyStats": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}'));
+        const [riskFlags, setRiskFlags] = useState([]);
+        
+        // UI States
+        const [view, setView] = useState('dashboard');
+        const [currentTime, setCurrentTime] = useState(Date.now());
+        const [alertTask, setAlertTask] = useState(null);
+        
+        // Modals & Inputs
+        const [newTaskName, setNewTaskName] = useState("");
+        const [newTaskCategory, setNewTaskCategory] = useState("Health");
+        const [isCriticalNew, setIsCriticalNew] = useState(false);
+        const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+        const [simDays, setSimDays] = useState(7);
+        
+        // NEW: Emergency & Reason Modals
+        const [emergencyActive, setEmergencyActive] = useState(false);
+        const [reasonModalOpen, setReasonModalOpen] = useState(false);
+        const [lastFeedbackTask, setLastFeedbackTask] = useState(null);
+
+        // --- BASILI TUTMA MANTIĞI (GÜNCELLENMİŞ) ---
+        const [pressProgress, setPressProgress] = useState(0);
+        const pressTimerRef = useRef(null);
+
+        const handlePressStart = () => {
+            // Varsa eski sayacı temizle
+            if (pressTimerRef.current) clearInterval(pressTimerRef.current);
+            
+            // Her 15ms'de %2 artır (Yaklaşık 0.75 saniyede dolar)
+            pressTimerRef.current = setInterval(() => {
+                setPressProgress(prev => {
+                    if (prev >= 100) {
+                        // SÜRE DOLDU!
+                        clearInterval(pressTimerRef.current);
+                        setEmergencyActive(true); // <--- SADECE BURADA TETİKLENİR
+                        setPressProgress(0);
+                        return 0;
+                    }
+                    return prev + 2; 
+                });
+            }, 15);
+        };
+
+        const handlePressEnd = () => {
+            // Elini çektiği an veya mouse butondan ayrıldığı an sayacı iptal et
+            if (pressTimerRef.current) clearInterval(pressTimerRef.current);
+            setPressProgress(0); // İlerlemeyi sıfırla (İşlem iptal olur)
+        };
+
+        // --- PERSISTENCE EFFECTS ---
+        useEffect(() => { localStorage.setItem('memoryOs_tasks', JSON.stringify(tasks)); }, [tasks]);
+        useEffect(() => { localStorage.setItem('memoryOs_settings', JSON.stringify(settings)); }, [settings]);
+        useEffect(() => { localStorage.setItem('memoryOs_profile', JSON.stringify(userProfile)); }, [userProfile]);
+        useEffect(() => { localStorage.setItem('memoryOs_calendar', JSON.stringify(calendarEvents)); }, [calendarEvents]);
+        useEffect(() => { localStorage.setItem('memoryOs_logs', JSON.stringify(actionLogs)); }, [actionLogs]);
+        useEffect(() => { localStorage.setItem('memoryOs_dailyScores', JSON.stringify(dailyScores)); }, [dailyScores]);
+        useEffect(() => { localStorage.setItem('memoryOs_behavior', JSON.stringify(behaviorProfile)); }, [behaviorProfile]);
+        // --- SİSTEM EFEKTİ: SADECE DURUM DEĞİŞİNCE GÜNCELLE ---
+        useEffect(() => {
+            if (userProfile.condition) {
+                // Fonksiyona artık sadece condition gönderiyoruz
+                const smartLambda = calculateSmartLambda(userProfile.condition);
+                
+                if (settings.baseLambda !== smartLambda) {
+                    setSettings(prev => ({ ...prev, baseLambda: smartLambda }));
+                    console.log(`Algoritma Güncellendi (Durum Bazlı): ${smartLambda}`);
+                }
+            }
+        }, [userProfile.condition]); // Sadece condition değişirse çalışır
+
+        // --- SYSTEM EFFECTS ---
+
+        // Hasta Mode Body Class (Sadece Rol 'Hasta' ise arayüz değişir)
+        useEffect(() => {
+            // Kilit Nokta: Ayar açık olsa bile, giren kişi doktor/veli ise siyah ekran olmasın.
+            if (settings.HastaMode && currentUser && currentUser.role === 'Hasta') {
+                document.body.classList.add('Hasta-mode');
+            } else {
+                document.body.classList.remove('Hasta-mode');
+            }
+            
+            if (emergencyActive) document.body.classList.add('emergency-active');
+            else document.body.classList.remove('emergency-active');
+        }, [settings.HastaMode, emergencyActive, currentUser]);
+
+        // Calendar Checker
+        useEffect(() => {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const todayEvents = calendarEvents.filter(e => e.date === todayStr && !e.processed);
+            
+            if (todayEvents.length > 0) {
+                todayEvents.forEach(evt => {
+                    const newTask = {
+                        id: Date.now() + Math.random(),
+                        name: evt.title,
+                        category: 'Daily',
+                        startTime: Date.now(),
+                        lambda: settings.baseLambda,
+                        completed: false,
+                        history: [],
+                        isCritical: false,
+                        lastAlarmDate: null,
+                        DoktorNotes: "Otomatik Takvim Girişi",
+                        isVeliNote: false
+                    };
+                    setTasks(prev => [...prev, newTask]);
+                });
+                setCalendarEvents(prev => prev.map(e => e.date === todayStr ? { ...e, processed: true } : e));
+            }
+        }, [calendarEvents, settings.baseLambda]);
+
+        // CORE LOOP: Time & Threshold Check & Collapse Detection
+        useEffect(() => {
+            const timer = setInterval(() => {
+                const now = Date.now();
+                setCurrentTime(now);
+
+                // 1. Alert Check (Sadece 'Hasta' rolü için çalışır)
+                if (!alertTask && !emergencyActive && currentUser && currentUser.role === 'Hasta') {
+                    const tasksToCheck = [...tasks].sort((a, b) => (b.isCritical ? 1 : 0) - (a.isCritical ? 1 : 0));
+                    for (const task of tasksToCheck) {
+                        if (!task.completed) {
+                            const elapsed = (now - task.startTime) / 1000;
+                            
+                            // Adaptive Threshold based on Behavior Profile (Fatigue check)
+                            const currentHour = new Date().getHours();
+                            const hourlyEfficiency = behaviorProfile.hourlyStats[currentHour];
+                            const fatigueModifier = hourlyEfficiency < -5 ? 5 : 0; // If user usually forgets at this hour, alert earlier (higher threshold)
+
+                            let thresholdAdj = 0;
+                            if (userProfile.condition === 'Hafif') thresholdAdj = 5;
+                            if (userProfile.condition === 'Orta') thresholdAdj = 10;
+                            if (userProfile.condition === 'İleri') thresholdAdj = 15;
+
+                            const effectiveThreshold = (task.isCritical ? settings.threshold + 10 : settings.threshold) + thresholdAdj + fatigueModifier;
+                            const retention = calculateRetention(elapsed, task.lambda);
+                            
+                            if (retention < effectiveThreshold) {
+                                const today = new Date().toDateString();
+                                if (task.lastAlarmDate !== today) {
+                                    triggerAlarm(task);
+                                    break; 
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 2. Daily Score Calculation (Run once a day at 23:59 or on load if missing)
+                const todayStr = new Date().toDateString();
+                const existingScore = dailyScores.find(s => new Date(s.date).toDateString() === todayStr);
+                if (!existingScore) {
+                    const newScore = calculateDailyCognitiveScore(tasks);
+                    setDailyScores(prev => [...prev, { date: new Date().toISOString(), ...newScore }]);
+                } else {
+                    // Update existing score periodically
+                    if (now % 60000 < 1000) { // Every minute
+                         const updatedScore = calculateDailyCognitiveScore(tasks);
+                         setDailyScores(prev => prev.map(s => new Date(s.date).toDateString() === todayStr ? { ...s, ...updatedScore } : s));
+                    }
+                }
+
+                // 3. Early Cognitive Collapse Detection
+                if (now % 300000 < 1000) { // Every 5 minutes
+                    detectCognitiveCollapse();
+                }
+
+            }, 1000);
+            return () => clearInterval(timer);
+        }, [tasks, alertTask, settings, userProfile, emergencyActive, behaviorProfile, dailyScores]);
+
+
+        // --- HELPER FUNCTIONS ---
+
+        const logAction = (action, details) => {
+            const newLog = {
+                timestamp: new Date().toISOString(),
+                actor: currentUser ? currentUser.role : 'System',
+                action,
+                details
+            };
+            setActionLogs(prev => [newLog, ...prev]);
+        };
+
+        const triggerAlarm = (task) => {
+            setAlertTask(task);
+            if (settings.soundEnabled) {
+                const text = settings.HastaMode 
+                    ? `Hatırlatma. ${task.name}.` 
+                    : `Dikkat. ${task.name} hatırlatması.`;
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'tr-TR';
+                if (settings.HastaMode) utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            }
+        };
+
+        const detectCognitiveCollapse = () => {
+            // Check for 3 consecutive days of Lambda Increase OR Sudden Variance
+            const recentLogs = actionLogs.filter(l => l.action === 'FEEDBACK').slice(0, 20);
+            const forgotRate = recentLogs.filter(l => l.details.includes('forgot')).length / (recentLogs.length || 1);
+            
+            if (forgotRate > 0.7) { // 70% forgetting rate in last 20 actions
+                if (!riskFlags.some(f => f.type === 'HIGH_FORGETTING_RATE')) {
+                    const flag = { id: Date.now(), type: 'HIGH_FORGETTING_RATE', date: new Date().toISOString(), msg: 'Son 20 etkileşimde %70 unutma oranı.' };
+                    setRiskFlags(prev => [...prev, flag]);
+                }
+            }
+        };
+
+        const updateBehaviorProfile = (isSuccess) => {
+            const hour = new Date().getHours();
+            setBehaviorProfile(prev => {
+                const newStats = [...prev.hourlyStats];
+                newStats[hour] = newStats[hour] + (isSuccess ? 1 : -1);
+                return { ...prev, hourlyStats: newStats };
+            });
+        };
+
+        // --- AUTHENTICATION ---
+        const handleLogin = (e) => {
+            e.preventDefault();
+            const { tc, pin } = authInput;
+            const user = USER_DB[tc];
+
+            if (!user) {
+                setAuthError('TC Kimlik No bulunamadı.');
+                return;
+            }
+
+            if (user.role === 'Hasta') {
+                // Hasta has no PIN
+                setCurrentUser({ ...user, tc });
+                setSettings(s => ({ ...s, HastaMode: true, viewerMode: 'user' }));
+                setUserProfile(p => ({ ...p, tc, name: user.name }));
+            } else {
+                if (user.pin !== pin) {
+                    setAuthError('Hatalı PIN.');
+                    return;
+                }
+                // Doktor or Veli
+                const patientData = USER_DB[user.patientTC || user.linkedDoktor]; // Simplified linkage
+                setCurrentUser({ ...user, tc, patientId: user.patientTC || '11111111111' });
+                setSettings(s => ({ ...s, HastaMode: false, viewerMode: user.role }));
+            }
+            setAuthError('');
+        };
+
+        // --- TASK ACTIONS ---
+
+        const addTask = (e) => {
+            e.preventDefault();
+            if (!newTaskName.trim()) return;
+
+            const detectedCat = detectCategory(newTaskName);
+            
+            // ARTIK HESAPLAMA YOK, MERKEZİ AYARI KULLANIYORUZ
+            // settings.baseLambda yukarıdaki useEffect sayesinde zaten kişiye özel.
+            const finalLambda = settings.baseLambda; 
+
+            const newTask = {
+                id: Date.now(),
+                name: newTaskName,
+                category: newTaskCategory === 'Health' ? detectedCat : newTaskCategory, 
+                startTime: Date.now(),
+                lambda: finalLambda, // <-- Direkt atandı
+                completed: false,
+                history: [],
+                isCritical: isCriticalNew, 
+                lastAlarmDate: null,
+                DoktorNotes: "",
+                isVeliNote: currentUser && currentUser.role === 'Veli'
+            };
+
+            setTasks(prev => [...prev, newTask]);
+            logAction('ADD_TASK', `Task: ${newTaskName} added by ${currentUser ? currentUser.role : 'Unknown'}`);
+            setNewTaskName("");
+            setIsCriticalNew(false);
+        };
+
+        const deleteTask = (id) => {
+            const task = tasks.find(t => t.id === id);
+            if (currentUser && currentUser.role === 'Hasta' && !userProfile.allowDelete) {
+                alert("Silme yetkiniz bulunmamaktadır. Lütfen ailenizle görüşün.");
+                return;
+            }
+            if (task && task.isVeliNote && currentUser && currentUser.role === 'Hasta') {
+                alert("Aile notlarını silemezsiniz.");
+                return;
+            }
+
+            if (deleteConfirmId === id) {
+                setTasks(prev => prev.filter(t => t.id !== id));
+                setDeleteConfirmId(null);
+                logAction('DELETE_TASK', `Task ${id} deleted`);
+            } else {
+                setDeleteConfirmId(id);
+                setTimeout(() => setDeleteConfirmId(null), 3000);
+            }
+        };
+
+        const handleFeedback = (taskId, status) => {
+            updateBehaviorProfile(status === 'remembered');
+
+            setTasks(prev => prev.map(task => {
+                if (task.id !== taskId) return task;
+                
+                let newLambda = task.lambda;
+                if (status === 'forgot') newLambda *= 1.4; 
+                if (status === 'remembered') newLambda *= 0.6; 
+
+                return {
+                    ...task,
+                    startTime: Date.now(), 
+                    lambda: newLambda,
+                    lastAlarmDate: new Date().toDateString(),
+                    history: [...task.history, { date: Date.now(), result: status, oldLambda: task.lambda }]
+                };
+            }));
+            
+            logAction('FEEDBACK', `Task ${taskId} feedback: ${status}`);
+
+            // If forgotten, trigger Reason Modal
+            if (status === 'forgot') {
+                setLastFeedbackTask(tasks.find(t => t.id === taskId));
+                setReasonModalOpen(true);
+            }
+
+            setAlertTask(null);
+        };
+
+        const submitForgotReason = (reason) => {
+            if (lastFeedbackTask) {
+                logAction('FORGOT_REASON', `Task ${lastFeedbackTask.id} reason: ${reason}`);
+                // Adjust lambda further based on reason
+                if (reason === 'too_hard' || reason === 'distracted') {
+                    setTasks(prev => prev.map(t => t.id === lastFeedbackTask.id ? { ...t, lambda: t.lambda * 1.1 } : t));
+                }
+            }
+            setReasonModalOpen(false);
+            setLastFeedbackTask(null);
+        };
+
+        // --- REPORTING ENGINE ---
+        const exportWordReport = () => {
+            // DÜZELTME 3: Rapor fonksiyonundaki link hataları giderildi
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>MemoryOS Rapor</title></head><body>";
+            const footer = "</body></html>";
+            
+            const score = calculateDailyCognitiveScore(tasks);
+            
+            let content = `
+                <h1 style="color:#333; font-Veli:Arial">MemoryOS v4.0 - Kapsamlı Bilişsel Rapor</h1>
+                <p><strong>Hasta:</strong> ${userProfile.name} (${userProfile.tc})</p>
+                <p><strong>Tarih:</strong> ${new Date().toLocaleString('tr-TR')}</p>
+                <p><strong>Günlük Skor:</strong> ${score.score}/100 (${score.status})</p>
+                
+                <hr/>
+                
+                <h2 style="color:#d32f2f">⚠️ Risk İndikatörleri</h2>
+                ${riskFlags.length > 0 ? `<ul>${riskFlags.map(f => `<li>${f.date}: ${f.msg}</li>`).join('')}</ul>` : '<p>Aktif risk bulunmamaktadır.</p>'}
+
+                <h2>Davranış Analizi</h2>
+                <p>En Verimli Saatler: ${behaviorProfile.hourlyStats.map((v, i) => ({v, i})).sort((a,b) => b.v - a.v).slice(0,3).map(x => x.i + ":00").join(', ')}</p>
+                
+                <h2>Simülasyon Verileri (${simDays} Gün)</h2>
+                <table border="1" style="border-collapse: collapse; width: 100%;">
+                    <tr style="background-color: #f0f0f0;">
+                        <th>Görev</th>
+                        <th>Lambda</th>
+                        <th>Beklenen Başarı</th>
+                    </tr>
+                    ${tasks.map(t => {
+                        const proj = simulateProjection(t.lambda, simDays);
+                        return `<tr><td>${t.name}</td><td>${t.lambda.toFixed(5)}</td><td>%${proj.current.toFixed(1)}</td></tr>`;
+                    }).join('')}
+                </table>
+            `;
+            
+            const source = header + content + footer;
+            const blob = new Blob(['\ufeff', source], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `MemoryOS_Rapor_${userProfile.name}_${new Date().toISOString().slice(0,10)}.doc`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+        // --- VIEW RENDERERS ---
+
+        const renderLogin = () => (
+            <div className="min-h-screen flex items-center justify-center p-4">
+                <div className="glass-panel p-8 rounded-3xl max-w-md w-full slide-in">
+                    <h1 className="text-4xl font-black text-white text-center mb-2 tracking-tighter">Memory<span className="gradient-text">OS</span></h1>
+                    <p className="text-center text-slate-400 mb-8 font-mono text-xs">Alzheimer Hastaları İçin</p>
+                    
+                    <form onSubmit={handleLogin} className="space-y-4">
+                        <div>
+                            <label className="block text-xs text-slate-400 mb-1">TC Kimlik No</label>
+                            <input 
+                                type="text" 
+                                value={authInput.tc}
+                                onChange={e => setAuthInput({...authInput, tc: e.target.value})}
+                                className="w-full glass-input rounded-xl p-3 text-lg font-mono tracking-widest text-center"
+                                placeholder="___________"
+                                maxLength="11"
+                            />
+                        </div>
+                        
+                        {authInput.tc && USER_DB[authInput.tc] && USER_DB[authInput.tc].role !== 'Hasta' && (
+                            <div className="animate-slide-up">
+                                <label className="block text-xs text-slate-400 mb-1">PIN Kodu</label>
+                                <input 
+                                    type="password" 
+                                    value={authInput.pin}
+                                    onChange={e => setAuthInput({...authInput, pin: e.target.value})}
+                                    className="w-full glass-input rounded-xl p-3 text-lg font-mono tracking-widest text-center"
+                                    placeholder="****"
+                                    maxLength="4"
+                                />
+                            </div>
+                        )}
+
+                        {authError && <div className="text-red-400 text-sm text-center font-bold bg-red-500/10 p-2 rounded-lg">{authError}</div>}
+                        
+                        <button type="submit" className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(99,102,241,0.4)] transition-all transform hover:scale-[1.02]">
+                            GÜVENLİ GİRİŞ
+                        </button>
+                    </form>
+                    
+                    <div className="mt-8 grid grid-cols-3 gap-2 opacity-50 text-[10px] text-center font-mono">
+                        <div>Hasta ID:<br/>11111111111</div>
+                        <div>Veli ID:<br/>22222222222</div>
+                        <div>Doktor ID:<br/>33333333333</div>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const renderEmergency = () => (
+            <div className="fixed inset-0 z-[100] bg-red-950 flex flex-col items-center justify-center p-6 text-center animate-pulse-slow">
+                <div className="bg-red-600 w-32 h-32 rounded-full flex items-center justify-center mb-8 animate-bounce">
+                    <Icons.Alert />
+                </div>
+                <h1 className="text-6xl font-black text-white mb-4">ACİL DURUM</h1>
+                <p className="text-2xl text-red-200 mb-12">KULLANICI ZOR DURUMDA</p>
+                
+                <div className="bg-white text-black p-8 rounded-3xl w-full max-w-2xl text-left space-y-6">
+                    <h2 className="text-3xl font-bold border-b-2 border-black pb-2">KİMLİK BİLGİLERİ</h2>
+                    <div className="grid grid-cols-2 gap-4 text-xl">
+                        <div><strong>Ad Soyad:</strong> {userProfile.name}</div>
+                        <div><strong>Yaş:</strong> {userProfile.age}</div>
+                        <div><strong>TC:</strong> {userProfile.tc}</div>
+                        <div><strong>Durum:</strong> {userProfile.condition}</div>
+                    </div>
+                    
+                    <div className="mt-8 p-4 bg-red-100 border-l-4 border-red-600 rounded">
+                        <h3 className="font-bold text-red-800">AİLE İLETİŞİM</h3>
+                        <p className="text-2xl font-mono mt-2">0555 555 55 55 (Ayşe Yılmaz)</p>
+                    </div>
+                     <div className="p-4 bg-blue-100 border-l-4 border-blue-600 rounded">
+                        <h3 className="font-bold text-blue-800">DOKTOR</h3>
+                        <p className="text-2xl font-mono mt-2">0212 222 22 22 (Dr. Öz)</p>
+                    </div>
+                </div>
+                
+            {/* --- GÜVENLİ ACİL DURUM BUTONU (KESİN ÇÖZÜM) --- */}
+            {currentUser && currentUser.role === 'Hasta' && (
+                <div className="fixed top-4 right-4 z-50 select-none">
+                    <button 
+                        // DİKKAT: onClick YOK. Sadece basılı tutunca çalışır.
+                        onMouseDown={handlePressStart}
+                        onMouseUp={handlePressEnd}
+                        onMouseLeave={handlePressEnd} // Mouse butondan kayarsa iptal et
+                        onTouchStart={handlePressStart} // Mobil dokunma
+                        onTouchEnd={handlePressEnd} // Mobil çekme
+                        className="relative overflow-hidden bg-red-950 border-2 border-red-500 text-white font-bold px-6 py-3 rounded-full shadow-[0_0_20px_rgba(220,38,38,0.6)] group active:scale-95 transition-transform cursor-pointer"
+                    >
+                        {/* Arka Plandaki Dolum Efekti (Kırmızı) */}
+                        <div 
+                            className="absolute top-0 left-0 h-full bg-red-600 transition-all duration-75 ease-linear" 
+                            style={{ width: `${pressProgress}%` }}
+                        ></div>
+                        
+                        {/* Yazı (Progress bar'ın üstünde kalmalı) */}
+                        <span className="relative z-10 flex items-center gap-2 pointer-events-none">
+                            <Icons.Alert />
+                            {/* Kullanıcıya ne yapması gerektiğini söylüyoruz */}
+                            {pressProgress > 0 ? 'BASILI TUTUN...' : 'ACİL DURUM (BASILI TUT)'}
+                        </span>
+                    </button>
+                </div>
+            )}
+            {/* ÇIKIŞ BUTONU */}
+        <div className="mt-12 flex flex-col gap-4 w-full max-w-md">
+            <button 
+                onClick={() => {
+                    setEmergencyActive(false);
+                    setPressProgress(0); // Güvenlik için progress'i sıfırla
+                }} 
+                className="bg-white text-red-900 font-black text-xl py-4 rounded-xl hover:bg-gray-200 transition-colors shadow-lg"
+            >
+                GÜVENDEYİM / KAPAT
+            </button>
+            <p className="text-red-300/50 text-sm">Yanlışlıkla bastıysanız kapatabilirsiniz.</p>
+        </div>
+            </div>
+        );
+
+        const renderHastaHome = () => (
+            <div className="space-y-6 slide-in">
+                
+                {/* --- YENİ EKLENEN KISIM: Hasta VERİ EKLEME PANELİ --- */}
+                {settings.allowHastaAdd && (
+                    <div className="bg-Hasta-card border-4 border-dashed border-gray-600 p-6 rounded-2xl mb-8">
+                        <h3 className="text-xl font-bold text-white mb-4">YENİ HATIRLATMA EKLE</h3>
+                        {(currentUser.role !== 'Hasta' || settings.allowHastaAdd) && (
+                            <form onSubmit={addTask} className="glass-panel p-3 rounded-2xl flex flex-col md:flex-row gap-3 neon-shadow">
+                            <input 
+                                type="text" 
+                                value={newTaskName}
+                                onChange={(e) => setNewTaskName(e.target.value)}
+                                placeholder="BURAYA YAZIN..." 
+                                // text-white: Yazı Beyaz
+                                // bg-black: Arka Plan Siyah (Yüksek Kontrast için)
+                                // border-white: Çerçeve Beyaz
+                                className="w-full p-4 text-2xl font-bold bg-black text-white border-4 border-white rounded-xl placeholder-gray-500 focus:outline-none focus:border-yellow-400 transition-colors"
+                            />
+                            <div className="flex gap-3">
+                                {/* Kategori Seçimi (Basitleştirilmiş) */}
+                                <button type="button" onClick={() => setNewTaskCategory('Health')} className={`flex-1 p-4 rounded-xl font-bold border-4 ${newTaskCategory === 'Health' ? 'bg-red-500 text-white border-white' : 'bg-black text-gray-500 border-gray-600'}`}>
+                                    💊 SAĞLIK
+                                </button>
+                                <button type="button" onClick={() => setNewTaskCategory('Daily')} className={`flex-1 p-4 rounded-xl font-bold border-4 ${newTaskCategory === 'Daily' ? 'bg-blue-500 text-white border-white' : 'bg-black text-gray-500 border-gray-600'}`}>
+                                    📅 GÜNLÜK
+                                </button>
+                            </div>
+                            <button type="submit" className="bg-white text-black font-black text-2xl py-4 rounded-xl hover:scale-105 transition-transform">
+                                KAYDET
+                            </button>
+                        </form>
+                    )}
+                    </div>
+                )}
+                {/* --- EKLEME PANELİ BİTİŞ --- */}
+
+                {/* WHO AM I Panel (Eski Kod Devam Ediyor...) */}
+                <div className="bg-Hasta-card border-l-8 border-Hasta-accent p-6 rounded-r-xl mb-8">
+                    <h2 className="text-Hasta-accent text-xl font-bold mb-1">KİMLİK KARTI</h2>
+                    <p className="text-3xl font-bold text-white">{userProfile.name}</p>
+                    <p className="text-xl text-gray-400">{new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                </div>
+
+                {/* Immediate Tasks Only - Filtered Reality */}
+                <h2 className="text-4xl font-black text-white border-b-4 border-white pb-4 mb-6">YAPILACAKLAR</h2>
+                
+                <div className="space-y-6">
+                    {tasks.filter(t => !t.completed && calculateRetention((currentTime - t.startTime)/1000, t.lambda) < 60).map(task => (
+                         <div key={task.id} className="bg-Hasta-card border-4 border-white p-6 rounded-2xl flex justify-between items-center">
+                            <div>
+                                <span className={`inline-block px-3 py-1 rounded text-black font-bold mb-2 ${task.category === 'Health' ? 'bg-red-400' : 'bg-blue-400'}`}>
+                                    {task.category === 'Health' ? 'SAĞLIK' : 'GÜNLÜK'}
+                                </span>
+                                <div className="text-4xl font-bold text-white">{task.name}</div>
+                            </div>
+                            <button onClick={() => handleFeedback(task.id, 'remembered')} className="bg-Hasta-success text-black font-bold p-6 rounded-xl text-2xl hover:scale-105 transition-transform">
+                                YAPTIM
+                            </button>
+                         </div>
+                    ))}
+                     {tasks.filter(t => !t.completed && calculateRetention((currentTime - t.startTime)/1000, t.lambda) < 60).length === 0 && (
+                        <div className="text-center py-20 text-3xl text-gray-500 font-bold border-2 border-dashed border-gray-700 rounded-3xl">
+                            ŞU AN YAPILACAK BİR ŞEY YOK.
+                            <br/>
+                            DİNLENEBİLİRSİNİZ.
+                        </div>
+                     )}
+                </div>
+            </div>
+        );
+
+        const renderDoktorDashboard = () => (
+            <div className="space-y-8 slide-in">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* 1. Daily Cognitive Score Card */}
+                    <div className="glass-panel p-6 rounded-2xl border-t-4 border-indigo-500">
+                        <h3 className="text-indigo-400 font-bold flex items-center gap-2 mb-4"><Icons.Brain/> Günlük Bilişsel Skor</h3>
+                        {dailyScores.length > 0 ? (
+                            <div>
+                                <div className="text-5xl font-black text-white mb-2">{dailyScores[dailyScores.length-1].score}<span className="text-2xl text-slate-500">/100</span></div>
+                                <div className="text-sm text-slate-400">Durum: <span className="text-white font-bold">{dailyScores[dailyScores.length-1].status}</span></div>
+                                
+                                {/* Simple Trend Line */}
+                                <div className="mt-4 h-16 flex items-end gap-1">
+                                    {dailyScores.slice(-7).map((ds, i) => (
+                                        <div key={i} className="flex-1 bg-indigo-500/20 rounded-t relative group">
+                                            <div style={{height: `${ds.score}%`}} className="bg-indigo-500 w-full rounded-t absolute bottom-0 transition-all"></div>
+                                            <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-white text-xs p-1 rounded whitespace-nowrap">{new Date(ds.date).toLocaleDateString()}: {ds.score}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : <div className="text-slate-500">Veri toplanıyor...</div>}
+                    </div>
+
+                    {/* 2. Behavior Matrix */}
+                    <div className="glass-panel p-6 rounded-2xl border-t-4 border-green-500">
+                        <h3 className="text-green-400 font-bold flex items-center gap-2 mb-4"><Icons.Clock/> Davranış Matrisi</h3>
+                        <div className="grid grid-cols-6 gap-1 h-32">
+                            {behaviorProfile.hourlyStats.map((val, h) => {
+                                const intensity = Math.min(1, Math.abs(val) / 5);
+                                const color = val > 0 ? `rgba(74, 222, 128, ${intensity})` : `rgba(248, 113, 113, ${intensity})`;
+                                return (
+                                    <div key={h} className="rounded text-[8px] flex items-center justify-center text-slate-300 border border-white/5" style={{backgroundColor: color}}>
+                                        {h}
+                                    </div>
+                                )
+                            })}
+                        </div>
+                        <p className="text-xs text-slate-400 mt-2">Yeşil: Yüksek Hatırlama | Kırmızı: Unutkanlık Bölgesi</p>
+                    </div>
+
+                     {/* 3. Risk Flags */}
+                     <div className="glass-panel p-6 rounded-2xl border-t-4 border-red-500 overflow-y-auto max-h-60">
+                        <h3 className="text-red-400 font-bold flex items-center gap-2 mb-4"><Icons.Alert/> Risk İndikatörleri</h3>
+                        {riskFlags.length === 0 ? (
+                            <p className="text-emerald-500 text-sm">Aktif risk tespit edilmedi.</p>
+                        ) : (
+                            <ul className="space-y-2">
+                                {riskFlags.map(flag => (
+                                    <li key={flag.id} className="bg-red-500/10 p-2 rounded border border-red-500/20 text-xs text-red-200">
+                                        [{new Date(flag.date).toLocaleTimeString()}] {flag.msg}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                </div>
+
+                {/* Simulation Engine UI */}
+                <div className="glass-panel p-6 rounded-2xl">
+                     <div className="flex justify-between items-center mb-6">
+                        <h3 className="font-bold text-xl text-white">Uzun Vadeli Bilişsel Projeksiyon</h3>
+                        <div className="flex items-center gap-2 bg-slate-800 p-2 rounded-lg">
+                            <span className="text-xs text-slate-400">Simülasyon (Gün):</span>
+                            <input type="number" value={simDays} onChange={(e) => setSimDays(parseInt(e.target.value))} className="w-16 bg-transparent text-white font-mono text-center outline-none border-b border-indigo-500"/>
+                        </div>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="text-slate-400 text-sm border-b border-slate-700">
+                                    <th className="p-3">Görev</th>
+                                    <th className="p-3">Kategori</th>
+                                    <th className="p-3">Lambda (Zorluk)</th>
+                                    <th className="p-3">Mevcut Durum</th>
+                                    <th className="p-3 text-emerald-400">Terapi Senaryosu (+%15)</th>
+                                    <th className="p-3 text-red-400">İhmal Senaryosu (-%25)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {tasks.map(t => {
+                                    const proj = simulateProjection(t.lambda, simDays);
+                                    return (
+                                        <tr key={t.id} className="border-b border-slate-800 hover:bg-slate-800/50 transition-colors">
+                                            <td className="p-3 font-medium text-white">{t.name}</td>
+                                            <td className="p-3 text-xs text-slate-400">{t.category}</td>
+                                            <td className="p-3 font-mono text-xs text-indigo-300">{t.lambda.toFixed(5)}</td>
+                                            <td className="p-3 font-bold" style={{color: proj.current < 40 ? '#ef4444' : '#e2e8f0'}}>%{proj.current.toFixed(1)}</td>
+                                            <td className="p-3 font-bold text-emerald-400">%{proj.improved.toFixed(1)}</td>
+                                            <td className="p-3 font-bold text-red-400">%{proj.worse.toFixed(1)}</td>
+                                        </tr>
+                                    )
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        );
+
+        // --- APP LOGIC BRANCHING ---
+
+// --- GÖRÜNÜM RENDER ---
+    if (!currentUser) return renderLogin();
+    if (emergencyActive) return renderEmergency();
+
+    return (
+        <div className="min-h-screen pb-24 md:pb-0 md:pl-28 relative">
+            
+            {/* --- GÜVENLİ ACİL DURUM BUTONU (BASILI TUTMALI) --- */}
+            {currentUser && currentUser.role === 'Hasta' && (
+                <div className="fixed top-4 right-4 z-50 select-none">
+                    <button 
+                        // onClick YOK. Sadece basılı tutunca çalışır.
+                        onMouseDown={handlePressStart}
+                        onMouseUp={handlePressEnd}
+                        onMouseLeave={handlePressEnd}
+                        onTouchStart={handlePressStart} // Mobil için
+                        onTouchEnd={handlePressEnd}   // Mobil için
+                        className="relative overflow-hidden bg-red-950 border-2 border-red-500 text-white font-bold px-6 py-3 rounded-full shadow-[0_0_20px_rgba(220,38,38,0.6)] group active:scale-95 transition-transform cursor-pointer"
+                    >
+                        {/* Kırmızı Dolum Efekti */}
+                        <div 
+                            className="absolute top-0 left-0 h-full bg-red-600 transition-all duration-75 ease-linear" 
+                            style={{ width: `${pressProgress}%` }}
+                        ></div>
+                        
+                        {/* Buton Yazısı */}
+                        <span className="relative z-10 flex items-center gap-2 pointer-events-none">
+                            <Icons.Alert />
+                            {pressProgress > 0 ? 'BASILI TUTUN...' : 'ACİL DURUM'}
+                        </span>
+                    </button>
+                </div>
+            )}
+
+                {/* REASON MODAL */}
+                {reasonModalOpen && (
+                    <div className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+                        <div className="bg-slate-900 border border-slate-700 p-8 rounded-2xl max-w-lg w-full slide-in">
+                            <h2 className="text-2xl font-bold text-white mb-6">Neden Hatırlamadınız?</h2>
+                            <p className="text-slate-400 mb-6">Bu bilgi, doktorunuzun size daha iyi yardımcı olmasını sağlayacaktır.</p>
+                            <div className="grid grid-cols-1 gap-3">
+                                <button onClick={() => submitForgotReason('distracted')} className="p-4 bg-slate-800 hover:bg-indigo-600 rounded-xl text-left transition-colors">Dikkatim Dağıldı / Meşguldüm</button>
+                                <button onClick={() => submitForgotReason('too_hard')} className="p-4 bg-slate-800 hover:bg-indigo-600 rounded-xl text-left transition-colors">Görevi Anlamadım / Çok Zor</button>
+                                <button onClick={() => submitForgotReason('tired')} className="p-4 bg-slate-800 hover:bg-indigo-600 rounded-xl text-left transition-colors">Yorgunum / Uykusuzum</button>
+                                <button onClick={() => submitForgotReason('no_reminder')} className="p-4 bg-slate-800 hover:bg-indigo-600 rounded-xl text-left transition-colors">Hatırlatma Yetersizdi</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* ALERT MODAL - SADECE Hasta İÇİN */}
+                {alertTask && currentUser && currentUser.role === 'Hasta' && (
+                    <div className="fixed inset-0 bg-dark-900/90 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-[fadeIn_0.2s]">
+                        <div className={`${settings.HastaMode ? 'bg-black border-4 border-yellow-500 w-full h-full max-w-none rounded-none flex flex-col justify-center' : 'glass-panel w-full max-w-lg rounded-3xl p-1 bg-gradient-to-b from-red-500/50 to-transparent shadow-[0_0_50px_rgba(239,68,68,0.3)]'}`}>
+                            <div className={`${settings.HastaMode ? 'bg-black p-4' : 'bg-dark-900/90 rounded-[22px] p-8'} text-center relative overflow-hidden`}>
+                                {!settings.HastaMode && <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>}
+                                
+                                <div className={`${settings.HastaMode ? 'w-48 h-48 mb-8' : 'w-24 h-24 mb-6'} bg-red-500/10 rounded-full flex items-center justify-center mx-auto text-red-500 animate-pulse`}>
+                                    <Icons.Alert />
+                                </div>
+                                
+                                <h2 className={`${settings.HastaMode ? 'text-4xl text-yellow-400 mb-8 font-black' : 'text-sm font-bold text-red-500 tracking-widest uppercase mb-2'}`}>
+                                    {settings.HastaMode ? 'HATIRLATMA' : 'Kritik Hafıza Seviyesi'}
+                                </h2>
+                                <p className={`${settings.HastaMode ? 'text-6xl mb-16 text-white leading-tight' : 'text-3xl text-white mb-10'} font-bold`}>{alertTask.name}</p>
+                                
+                                <div className="grid grid-cols-2 gap-6">
+                                    <button onClick={() => handleFeedback(alertTask.id, 'forgot')} className={`${settings.HastaMode ? 'bg-red-900 text-white text-3xl py-10' : 'bg-slate-800 hover:bg-slate-700 text-slate-300 p-4'} rounded-xl font-bold transition-all border border-white/5`}>
+                                        {settings.HastaMode ? 'HATIRLAMADIM' : 'Hatırlamadım'}
+                                    </button>
+                                    <button onClick={() => handleFeedback(alertTask.id, 'remembered')} className={`${settings.HastaMode ? 'bg-green-600 text-white text-3xl py-10' : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white p-4'} rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(79,70,229,0.4)]`}>
+                                        {settings.HastaMode ? 'YAPTIM' : 'Hatırladım'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* NAVIGATION - LOCKED MODE FIX APPLIED */}
+                <nav className={`fixed bottom-0 md:left-0 md:top-0 w-full md:w-28 ${settings.HastaMode ? 'bg-black border-t-4 border-white' : 'bg-dark-900/80 md:bg-dark-900/50 backdrop-blur-xl border-t md:border-t-0 md:border-r border-white/5'} z-40 flex md:flex-col justify-around md:justify-center items-center p-4 md:gap-10`}>
+                    <button 
+                        onClick={() => setView('dashboard')} 
+                        className={`p-4 rounded-2xl transition-all duration-300 ${view === 'dashboard' ? (settings.HastaMode ? 'bg-white text-black' : 'bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-neon-blue shadow-[0_0_15px_rgba(0,212,255,0.3)]') : 'text-slate-500 hover:text-slate-300'}`}
+                    >
+                        <Icons.Brain />
+                    </button>
+                    
+                    {/* Lock Mode Logic: Settings button is hidden or disabled if locked, BUT Nav remains usable */}
+                    {(!settings.locked || currentUser.role !== 'Hasta') && (
+                        <>
+                            <button onClick={() => setView('calendar')} className={`p-4 rounded-2xl transition-all duration-300 ${view === 'calendar' ? 'bg-white/10 text-white' : 'text-slate-500'}`}><Icons.Calendar /></button>
+                            <button onClick={() => setView('analytics')} className={`p-4 rounded-2xl transition-all duration-300 ${view === 'analytics' ? 'bg-white/10 text-white' : 'text-slate-500'}`}><Icons.Chart /></button>
+                            
+                            {/* [EXTENSION] Research Module Navigation Button */}
+                            {currentUser.role !== 'Hasta' && (
+                                <button 
+                                    onClick={() => setView('research')} 
+                                    className={`p-4 rounded-2xl transition-all duration-300 ${view === 'research' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.2)]' : 'text-slate-500 hover:text-indigo-400'}`}
+                                >
+                                    <Icons.Microscope />
+                                </button>
+                            )}
+                            
+                            <button onClick={() => setView('settings')} className={`p-4 rounded-2xl transition-all duration-300 ${view === 'settings' ? 'bg-white/10 text-white' : 'text-slate-500'}`}><Icons.Settings /></button>
+                        </>
+                    )}
+                    {settings.locked && currentUser.role === 'Hasta' && (
+                         <div className="opacity-30 p-4"><Icons.Lock/></div>
+                    )}
+                    {/* --- Hasta VERİ GİRİŞ İZNİ (Sadece Doktor ve Veli Görür) --- */}
+                    {currentUser.role !== 'Hasta' && (
+                        <label className="flex items-center gap-4 cursor-pointer bg-slate-800/50 p-4 rounded-xl border border-white/5 mt-2">
+                            <div className={`w-14 h-8 rounded-full p-1 transition-colors ${settings.allowHastaAdd ? 'bg-green-500' : 'bg-slate-700'}`}>
+                                <div className={`bg-white w-6 h-6 rounded-full shadow-md transform transition-transform ${settings.allowHastaAdd ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                            </div>
+                            <input type="checkbox" checked={settings.allowHastaAdd} onChange={e => setSettings({...settings, allowHastaAdd: e.target.checked})} className="hidden"/>
+                            <div>
+                                <span className="text-lg font-bold text-white block flex items-center gap-2">
+                                    <Icons.Plus /> Hasta Veri Girebilsin
+                                </span>
+                                <span className="text-sm text-slate-400">
+                                    Açık olursa, Hasta kendi ekranından "Yeni Hatırlatma" ekleyebilir. (Bu kutucuğun üzerine tıklayınca yarım daire görüyorsan mod açıktır.)
+                                </span>
+                            </div>
+                        </label>
+                    )}
+                </nav>
+
+                {/* MAIN CONTENT AREA */}
+                <main className="max-w-6xl mx-auto p-6 md:p-12">
+                     <header className="mb-10 flex justify-between items-center">
+                        <div>
+                            <h1 className={`font-black tracking-tight mb-1 ${settings.HastaMode ? 'text-4xl text-white uppercase' : 'text-3xl md:text-5xl text-white'}`}>
+                                {settings.HastaMode ? 'HATIRLATICI' : <React.Fragment>Memory<span className="gradient-text">OS</span></React.Fragment>}
+                            </h1>
+                            <p className="text-slate-400 text-sm md:text-base font-light">
+                                {currentUser.name} | {currentUser.role.toUpperCase()}
+                            </p>
+                        </div>
+                        <button onClick={() => setCurrentUser(null)} className="hidden md:block text-xs text-red-400 border border-red-500/30 px-3 py-1 rounded-full hover:bg-red-500/20">ÇIKIŞ</button>
+                    </header>
+
+                    {/* VIEW SWITCHING */}
+                    {view === 'dashboard' && (
+                        // Sadece ayar açık VE kullanıcı Hasta ise Yaşlı Ekranı render edilir
+                        (settings.HastaMode && currentUser.role === 'Hasta') ? renderHastaHome() : (
+                            currentUser.role === 'Doktor' ? renderDoktorDashboard() : (
+                                // STANDARD DASHBOARD (Veli/Normal User)
+                                <div className="space-y-8 slide-in">
+                                     {/* Quick Stats Row */}
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        <div className="glass-panel p-5 rounded-2xl">
+                                            <div className="text-slate-400 text-xs uppercase tracking-wider font-semibold mb-1">Aktif Bellek</div>
+                                            <div className="text-3xl font-bold text-white">{tasks.length}</div>
+                                        </div>
+                                        <div className="glass-panel p-5 rounded-2xl">
+                                            <div className="text-slate-400 text-xs uppercase tracking-wider font-semibold mb-1">Günlük Skor</div>
+                                            <div className="text-3xl font-bold text-neon-blue">{dailyScores.length > 0 ? dailyScores[dailyScores.length-1].score : 0}</div>
+                                        </div>
+                                        <div className="glass-panel p-5 rounded-2xl cursor-pointer hover:bg-white/5" onClick={exportWordReport}>
+                                            <div className="text-emerald-400 text-xs font-bold flex items-center gap-2 mb-1"><Icons.Download/> RAPOR</div>
+                                            <div className="text-xs text-slate-400">Veriyi İndir</div>
+                                        </div>
+                                    </div>
+
+                                    {/* Add Task Form */}
+                                    {(currentUser.role !== 'Hasta' || settings.allowHastaAdd) && (
+                                    <form onSubmit={addTask} className="glass-panel p-3 rounded-2xl flex flex-col md:flex-row gap-3 neon-shadow">
+                                        <div className="flex gap-3">
+                                            <select value={newTaskCategory} onChange={(e) => setNewTaskCategory(e.target.value)} className="bg-dark-800/50 text-slate-300 text-sm border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-neon-purple">
+                                                <option value="Health">💊 Sağlık</option>
+                                                <option value="Social">👥 Sosyal</option>
+                                                <option value="Daily">📅 Günlük</option>
+                                            </select>
+                                            <button type="button" onClick={() => setIsCriticalNew(!isCriticalNew)} className={`px-4 py-2 rounded-xl border transition-all ${isCriticalNew ? 'bg-red-500 text-white border-red-400' : 'bg-transparent text-slate-400 border-slate-600'}`}>
+                                                {isCriticalNew ? '⚠️ Önemli' : 'Normal'}
+                                            </button>
+                                        </div>
+                                        <input className="glass-input px-4 py-3 placeholder-slate-500 flex-1 rounded-xl outline-none transition-all" placeholder="Belleğe yeni veri ekle..." value={newTaskName} onChange={(e) => setNewTaskName(e.target.value)} />
+                                        <button type="submit" className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 rounded-xl shadow-lg"><Icons.Plus /></button>
+                                    </form>
+                                )}
+
+                                    {/* Task List */}
+                                    <div className="grid gap-4">
+                                        {tasks.map(task => {
+                                            const elapsed = (currentTime - task.startTime) / 1000;
+                                            const retention = calculateRetention(elapsed, task.lambda);
+                                            let barColorClass = retention < 40 ? 'bg-red-500' : retention < 70 ? 'bg-yellow-400' : 'bg-emerald-500';
+                                            
+                                            return (
+                                                <div key={task.id} className={`glass-panel p-6 rounded-2xl relative group ${task.isVeliNote ? 'border-l-4 border-l-purple-500' : ''}`}>
+                                                    <div className="flex justify-between items-start z-10 relative">
+                                                        <div>
+                                                            <div className="flex gap-2 mb-2">
+                                                                <span className="text-[10px] font-bold px-2 py-0.5 rounded border inline-block tracking-widest text-slate-400 border-slate-700">{task.category.toUpperCase()}</span>
+                                                                {task.isCritical && <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded animate-pulse">⚠️ KRİTİK</span>}
+                                                            </div>
+                                                            <h3 className="text-lg font-bold text-white tracking-tight">{task.name}</h3>
+                                                        </div>
+                                                        <div className="text-right flex flex-col items-end">
+                                                            <div className="text-2xl font-mono font-bold text-white mb-2">%{retention.toFixed(0)}</div>
+                                                            <button onClick={() => deleteTask(task.id)} className={`text-slate-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all ${deleteConfirmId === task.id ? 'text-red-500 opacity-100 scale-110' : ''}`}>
+                                                                {deleteConfirmId === task.id ? 'SİL?' : <Icons.Trash/>}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div className="mt-4 h-1.5 w-full bg-slate-800/50 rounded-full overflow-hidden backdrop-blur-sm">
+                                                        <div className={`h-full transition-all duration-1000 ease-out ${barColorClass}`} style={{ width: `${retention}%` }}></div>
+                                                    </div>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+                            )
+                        )
+                    )}
+
+                    {view === 'calendar' && (
+                        <div className="slide-in glass-panel p-8 rounded-3xl">
+                            <h2 className="text-2xl font-bold mb-6 text-white flex gap-2"><Icons.Calendar/> Takvim</h2>
+                            <p className="text-slate-400 mb-4">Buradaki etkinlikler günü geldiğinde otomatik olarak belleğe eklenir.</p>
+                            {/* Simple List View for Demo */}
+                            <div className="space-y-2">
+                                {calendarEvents.map((e, i) => (
+                                    <div key={i} className="flex justify-between p-4 bg-white/5 rounded-xl border border-white/5">
+                                        <span className="text-white">{e.title}</span>
+                                        <span className="text-slate-400 font-mono">{e.date}</span>
+                                    </div>
+                                ))}
+                                <button onClick={() => {
+                                     const date = prompt("Tarih (YYYY-MM-DD):");
+                                     const title = prompt("Etkinlik:");
+                                     if (date && title) setCalendarEvents([...calendarEvents, { date, title, processed: false }]);
+                                }} className="w-full py-3 border border-dashed border-slate-600 text-slate-400 rounded-xl hover:border-white hover:text-white transition-colors">+ Etkinlik Ekle</button>
+                            </div>
+                        </div>
+                    )}
+                    
+                    {/* --- SADELEŞTİRİLMİŞ ANALİZ EKRANI (SADECE RAPOR) --- */}
+{view === 'analytics' && (
+    <div className="slide-in flex items-center justify-center h-full min-h-[500px]">
+        <div className="glass-panel p-12 rounded-[40px] text-center max-w-2xl w-full border border-indigo-500/30 shadow-[0_0_60px_rgba(79,70,229,0.1)] relative overflow-hidden group">
+            
+            {/* Arka Plan Dekoru */}
+            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-400 via-indigo-500 to-emerald-400"></div>
+            <div className="absolute -top-20 -right-20 w-60 h-60 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-all duration-700"></div>
+
+            {/* İkon */}
+            <div className="w-24 h-24 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-3xl flex items-center justify-center mx-auto mb-8 text-indigo-400 shadow-inner ring-1 ring-white/10">
+                <div className="scale-150"><Icons.Word /></div>
+            </div>
+
+            {/* Başlık ve Açıklama */}
+            <h2 className="text-4xl font-black text-white mb-4 tracking-tight">
+                Rapor Merkezi
+            </h2>
+            <p className="text-slate-400 text-lg mb-10 leading-relaxed max-w-lg mx-auto">
+                Hasta gelişim verilerini, risk analizlerini ve günlük skorları içeren resmi klinik raporu oluşturmak için butona tıklayın.
+            </p>
+
+            {/* Dev Buton */}
+            <button 
+                onClick={exportWordReport}
+                className="group relative w-full sm:w-auto bg-white text-black font-black py-5 px-10 rounded-2xl shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:shadow-[0_0_50px_rgba(255,255,255,0.4)] transition-all transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-4 mx-auto overflow-hidden"
+            >
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 via-emerald-200 to-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <span className="relative z-10 flex items-center gap-3 text-lg">
+                    <Icons.Download />
+                    WORD RAPORU OLUŞTUR
+                </span>
+            </button>
+
+            {/* Alt Bilgi */}
+            <div className="mt-10 pt-6 border-t border-white/5 flex flex-col gap-2 text-sm text-slate-500 font-mono">
+                <p>Format: .DOCX (Microsoft Word)</p>
+                <p>İçerik: Skorlar, İlaç Takibi, Risk Analizi</p>
+            </div>
+        </div>
+    </div>
+)}
+                    {/* [EXTENSION] Research Module View Render */}
+                    {view === 'research' && (
+                        <ResearchDashboard dailyScores={dailyScores} logs={actionLogs} tasks={tasks} />
+                    )}
+
+                    {view === 'settings' && (
+                         <div className="slide-in glass-panel p-8 rounded-3xl">
+                            <h2 className="text-2xl font-bold mb-6 text-white">Ayarlar</h2>
+                            
+                            <div className="space-y-6">
+                                {/* Hasta Mode Toggle */}
+                                <label className="flex items-center gap-4 cursor-pointer bg-slate-800/50 p-4 rounded-xl border border-white/5">
+                                    <div className={`w-14 h-8 rounded-full p-1 transition-colors ${settings.HastaMode ? 'bg-yellow-500' : 'bg-slate-700'}`}>
+                                        <div className={`bg-white w-6 h-6 rounded-full shadow-md transform transition-transform ${settings.HastaMode ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                                    </div>
+                                    <input type="checkbox" checked={settings.HastaMode} onChange={e => setSettings({...settings, HastaMode: e.target.checked})} className="hidden"/>
+                                        <span className="text-lg font-bold text-white block">Hasta Arayüz Modu</span>
+                                        <span className="text-sm text-slate-400">
+                                            Aktif edilirse, <strong>Hasta giriş yaptığında</strong> basitleştirilmiş ekranı görür. 
+                                            (Sizin ekranınızı etkilemez.)
+                                        </span>
+                                </label>
+
+                                {/* Lock Mode - Only visible to admin/Veli */}
+                                {currentUser.role !== 'Hasta' && (
+                                    <label className="flex items-center gap-4 cursor-pointer bg-slate-800/50 p-4 rounded-xl border border-white/5">
+                                        <div className={`w-14 h-8 rounded-full p-1 transition-colors ${settings.locked ? 'bg-red-500' : 'bg-slate-700'}`}>
+                                            <div className={`bg-white w-6 h-6 rounded-full shadow-md transform transition-transform ${settings.locked ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                                        </div>
+                                        <input 
+                                            type="checkbox" 
+                                            checked={settings.HastaMode} 
+                                            // FIX: 'prev' kullanarak önceki ayarların (allowHastaAdd vb.) silinmesini engelliyoruz
+                                            onChange={e => setSettings(prev => ({ ...prev, HastaMode: e.target.checked }))} 
+                                            className="hidden"
+                                        />
+                                        <div>
+                                            <span className="text-lg font-bold text-white block flex items-center gap-2"><Icons.Lock/> Ayarları Kilitle</span>
+                                            <span className="text-sm text-slate-400">Yaşlı kullanıcının ayarları değiştirmesini engeller.</span>
+                                        </div>
+                                    </label>
+                                )}
+
+                                <div className="p-4 bg-blue-900/20 border border-blue-500/20 rounded-xl">
+                                    <h3 className="font-bold text-blue-400 mb-2">Profil Bilgileri</h3>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="text-xs text-slate-400">Bilişsel Durum</label>
+                                            <select value={userProfile.condition} onChange={e => setUserProfile({...userProfile, condition: e.target.value})} className="w-full bg-dark-900 border border-white/10 rounded p-2 text-white mt-1">
+                                                <option value="Normal">Normal</option>
+                                                <option value="Hafif">Hafif</option>
+                                                <option value="Orta">Orta</option>
+                                                <option value="İleri">İleri</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-slate-400">Yaş Grubu</label>
+                                            <select 
+                                                value={userProfile.age} 
+                                                onChange={e => setUserProfile({...userProfile, age: e.target.value})} 
+                                                className="w-full bg-dark-900 border border-white/10 rounded p-2 text-white mt-1"
+                                            >
+                                                <option value="0-18">0-18</option>
+                                                <option value="18-32">18-32</option>
+                                                <option value="32-65">32-65</option>
+                                                <option value="65-75">65-75</option>
+                                                <option value="75-85">75-85</option>
+                                                <option value="85+">85+</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="mt-4 p-3 bg-indigo-500/10 border border-indigo-500/30 rounded-lg">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-xs text-indigo-300 font-bold uppercase flex items-center gap-2">
+                                            <Icons.Brain /> Algoritma Hassasiyeti
+                                        </span>
+                                        <span className="font-mono text-xs text-white">λ: {settings.baseLambda.toFixed(5)}</span>
+                                    </div>
+                                    
+                                    {/* Görsel Bar */}
+                                    <div className="w-full bg-slate-800 h-2 mt-2 rounded-full overflow-hidden relative">
+                                        <div className="absolute left-1/4 top-0 bottom-0 w-0.5 bg-white/5"></div>
+                                        <div className="absolute left-2/4 top-0 bottom-0 w-0.5 bg-white/5"></div>
+                                        <div className="absolute left-3/4 top-0 bottom-0 w-0.5 bg-white/5"></div>
+                                        
+                                        <div 
+                                            className={`h-full transition-all duration-1000 ${
+                                                settings.baseLambda >= 0.001 ? 'bg-red-500' : 
+                                                settings.baseLambda >= 0.0005 ? 'bg-orange-500' : 
+                                                settings.baseLambda >= 0.0002 ? 'bg-yellow-400' : 'bg-emerald-500'
+                                            }`} 
+                                            style={{ width: `${Math.min(100, (settings.baseLambda / 0.001) * 100)}%` }}
+                                        ></div>
+                                    </div>
+                                    
+                                    <div className="flex justify-between text-[8px] text-slate-500 mt-1 font-mono">
+                                        <span>Yavaş Unutma</span>
+                                        <span>Hızlı Unutma</span>
+                                    </div>
+
+                                    <p className="text-[10px] text-slate-400 mt-2 border-t border-white/5 pt-2">
+                                        <strong className="text-slate-300">Bilişsel Tanı:</strong> {userProfile.condition}
+                                        <br/>
+                                        <span className="opacity-70">Algoritma sadece Hastalık evresine göre (Normal/Hafif/Orta/İleri) kalibre edilmiştir.</span>
+                                    </p>
+                                </div>
+                                </div>
+                                
+                                <button onClick={() => {localStorage.clear(); window.location.reload()}} className="text-red-500 text-sm hover:underline">Fabrika Ayarlarına Dön (Verileri Sil)</button>
+                            </div>
+                         </div>
+                    )}
+
+                </main>
+            </div>
+        );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+</script>
+</body>
+</html>
