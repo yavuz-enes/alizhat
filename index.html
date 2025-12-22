@@ -1235,11 +1235,11 @@ const ResearchDashboard = ({ dailyScores, logs, tasks }) => {
                     
                     <div className="mt-8 p-4 bg-red-100 border-l-4 border-red-600 rounded">
                         <h3 className="font-bold text-red-800">AİLE İLETİŞİM</h3>
-                        <p className="text-2xl font-mono mt-2">0555 555 55 55 (Ayşe Yılmaz)</p>
+                        <p className="text-2xl font-mono mt-2">[Hasta Velisi Numarası] [Hasta Velisi Adı]</p>
                     </div>
                      <div className="p-4 bg-blue-100 border-l-4 border-blue-600 rounded">
                         <h3 className="font-bold text-blue-800">DOKTOR</h3>
-                        <p className="text-2xl font-mono mt-2">0212 222 22 22 (Dr. Öz)</p>
+                        <p className="text-2xl font-mono mt-2">[Hasta Doktoru Numarası] [Hasta Doktoru Adı]</p>
                     </div>
                 </div>
                 
@@ -1693,7 +1693,7 @@ const ResearchDashboard = ({ dailyScores, logs, tasks }) => {
                                     </div>
                                 ))}
                                 <button onClick={() => {
-                                     const date = prompt("Tarih (YYYY-MM-DD):");
+                                     const date = prompt("Tarih (GG-AA-YYYY:");
                                      const title = prompt("Etkinlik:");
                                      if (date && title) setCalendarEvents([...calendarEvents, { date, title, processed: false }]);
                                 }} className="w-full py-3 border border-dashed border-slate-600 text-slate-400 rounded-xl hover:border-white hover:text-white transition-colors">+ Etkinlik Ekle</button>
