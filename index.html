@@ -1774,9 +1774,8 @@ const ResearchDashboard = ({ dailyScores, logs, tasks }) => {
                                         </div>
                                         <input 
                                             type="checkbox" 
-                                            checked={settings.HastaMode} 
-                                            // FIX: 'prev' kullanarak önceki ayarların (allowHastaAdd vb.) silinmesini engelliyoruz
-                                            onChange={e => setSettings(prev => ({ ...prev, HastaMode: e.target.checked }))} 
+                                            checked={settings.locked} // DOĞRU: Kilit durumu kontrol ediliyor
+                                            onChange={e => setSettings(prev => ({ ...prev, locked: e.target.checked }))} // DOĞRU: Kilit durumunu güncelliyor
                                             className="hidden"
                                         />
                                         <div>
