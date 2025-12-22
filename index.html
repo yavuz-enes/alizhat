@@ -273,9 +273,9 @@
     };
 
     const USER_DB = {
-        '11111111111': { role: 'Hasta', name: 'Ahmet Yılmaz', pin: null, linkedDoktor: '33333333333' },
-        '22222222222': { role: 'Veli', name: 'Ayşe (Kızınız)', pin: '1234', patientTC: '11111111111' },
-        '33333333333': { role: 'Doktor', name: 'Dr. Mehmet Öz', pin: '9999', patientTC: '11111111111' }
+        '11111111111': { role: 'Hasta', name: '[Hasta Adı]', pin: null, linkedDoktor: '33333333333' },
+        '22222222222': { role: 'Veli', name: '[Hasta Velisi Adı]', pin: '1234', patientTC: '11111111111' },
+        '33333333333': { role: 'Doktor', name: '[Hasta Doktoru Adı]', pin: '9999', patientTC: '11111111111' }
     };
 
 // --- [EXTENSION START] COGNITIVE SCIENCE & RESEARCH MODULE V1.0 ---
@@ -594,7 +594,7 @@ const ResearchDashboard = ({ dailyScores, logs, tasks }) => {
                                             <div className={`text-2xl font-bold ${reg.slope > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                                                 {reg.slope > 0 ? '↗ POZİTİF GELİŞİM' : '↘ GERİLEME SİNYALİ'}
                                             </div>
-                                            <div className="text-xs text-slate-400 mt-2 font-mono">Eğim (Slope): {reg.slope.toFixed(4)} | R²: {reg.r2.toFixed(2)}</div>
+                                            <div className="text-xs text-slate-400 mt-2 font-mono">Eğim: {reg.slope.toFixed(4)} | R²: {reg.r2.toFixed(2)}</div>
                                         </>
                                     );
                                 })()}
@@ -677,7 +677,7 @@ const ResearchDashboard = ({ dailyScores, logs, tasks }) => {
                                 </div>
                             </div>
                             <div className="bg-research-panel p-6 rounded-2xl border-l-4 border-neon-pink">
-                                <h3 className="text-neon-pink text-xs font-bold uppercase mb-2">Spike (Gecikme) Sayısı</h3>
+                                <h3 className="text-neon-pink text-xs font-bold uppercase mb-2">Gecikme Sayısı</h3>
                                 <div className="text-4xl font-mono font-bold text-white">
                                     {analyticsData.rTimes.filter(r => r.duration > 10000).length}
                                 </div>
@@ -1208,9 +1208,9 @@ const ResearchDashboard = ({ dailyScores, logs, tasks }) => {
                     </form>
                     
                     <div className="mt-8 grid grid-cols-3 gap-2 opacity-50 text-[10px] text-center font-mono">
-                        <div>Hasta ID:<br/>11111111111</div>
-                        <div>Veli ID:<br/>22222222222</div>
-                        <div>Doktor ID:<br/>33333333333</div>
+                        <div>Hasta TCKN:<br/>11111111111</div>
+                        <div>Veli TCKN:<br/>22222222222</div>
+                        <div>Doktor TCKN:<br/>33333333333</div>
                     </div>
                 </div>
             </div>
